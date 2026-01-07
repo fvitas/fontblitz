@@ -120,9 +120,7 @@
 
     body {
         @apply font-sans bg-background text-foreground;
-    }
-
-    html {
-        @apply font-sans;
+        @apply selection:bg-primary/80 selection:text-primary-foreground;
+        font-size: var(--text-sm) !important;
     }
 }
