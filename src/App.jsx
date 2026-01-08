@@ -65,6 +65,33 @@ const fuse = new Fuse([...tabs.flatMap(tab => tab.fonts)], {
   isCaseSensitive: false,
 })
 
+function injectFont(fontFamily, fontCss) {
+  let style = document.createElement('style')
+  style.id = `font-face-injection-${fontFamily.replace(/\s+/g, '-')}`
+  style.textContent = fontCss
+  document.head.appendChild(style)
+}
+
+function applyFont(fontFamily) {
+  const existingElement = document.getElementById('custom-font-override')
+  if (existingElement) {
+    existingElement.remove()
+  }
+
+  const style = document.createElement('style')
+  style.id = 'custom-font-override'
+  style.textContent = `
+    * {
+      font-family: ${fontFamily} !important;
+    }
+    
+    p, span, div, h1, h2, h3, h4, h5, h6, a, li, td, th, label, button, input, textarea, select {
+      font-family: ${fontFamily} !important;
+    }
+  `
+  document.head.appendChild(style)
+}
+
 export function App() {
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState('system')
@@ -107,44 +134,24 @@ export function App() {
     }
   }
 
-  async function selectFont(font, type = 'system') {
+  async function selectFont(font, fontType = 'system') {
     setSelectedFont(font)
 
-    // TODO (filipv): split and refactor this logic
-    if (type === 'system') {
-      const [tab] = await chrome?.tabs?.query({ active: true, currentWindow: true })
+    const [tab] = await chrome?.tabs?.query({ active: true, currentWindow: true })
+    if (!tab) {
+      return
+    }
 
-      if (!tab) {
-        return
-      }
+    if (fontType === 'system') {
       await chrome?.scripting?.executeScript({
         target: { tabId: tab.id },
-        func: fontFamily => {
-          const style = document.createElement('style')
-          style.id = 'custom-font-override'
-          style.textContent = `
-            * {
-              font-family: ${fontFamily} !important;
-            }
-            
-            p, span, div, h1, h2, h3, h4, h5, h6, a, li, td, th, label, button, input, textarea, select {
-              font-family: ${fontFamily} !important;
-            }
-          `
-          document.head.appendChild(style)
-        },
+        func: applyFont,
         args: [font.family],
       })
       return
     }
 
-    if (type === 'google') {
-      const [tab] = await chrome?.tabs?.query({ active: true, currentWindow: true })
-
-      if (!tab) {
-        return
-      }
-
+    if (fontType === 'google') {
       const fontUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font.family)}&display=swap`
 
       try {
@@ -179,33 +186,6 @@ export function App() {
           throw new Error(response.error || 'Failed to fetch font files')
         }
 
-        function injectFont(fontFamily, fontCss) {
-          let style = document.createElement('style')
-          style.id = `font-face-injection-${fontFamily.replace(/\s+/g, '-')}`
-          style.textContent = fontCss
-          document.head.appendChild(style)
-        }
-
-        function applyFont(fontFamily) {
-          const existingElement = document.getElementById('custom-font-override')
-          if (existingElement) {
-            existingElement.remove()
-          }
-
-          const style = document.createElement('style')
-          style.id = 'custom-font-override'
-          style.textContent = `
-          * {
-            font-family: ${fontFamily} !important;
-          }
-          
-          p, span, div, h1, h2, h3, h4, h5, h6, a, li, td, th, label, button, input, textarea, select {
-            font-family: ${fontFamily} !important;
-          }
-        `
-          document.head.appendChild(style)
-        }
-
         await chrome?.scripting?.executeScript({
           target: { tabId: tab.id },
           func: injectFont,
@@ -225,16 +205,6 @@ export function App() {
 
   return (
     <div className="bg-card text-card-foreground m-0 flex w-96 flex-col gap-4 p-4">
-      {/*<div className="flex items-center justify-between">*/}
-      {/*  <img src="/favicon/logo.svg" alt="Font Swapper logo" className="w-8" />*/}
-
-      {/*  <h2 className="font-[Bonheur_Royale] text-5xl leading-none">Font Switcher</h2>*/}
-
-      {/*  <Button variant="ghost" size="icon" onClick={() => window.close()}>*/}
-      {/*    <XIcon />*/}
-      {/*  </Button>*/}
-      {/*</div>*/}
-
       <div className="flex">
         <img src="/favicon/logo.svg" alt="Font Swapper logo" className="mr-4 w-8" />
 
