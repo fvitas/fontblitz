@@ -18,16 +18,28 @@ import {
   SunIcon,
   XIcon,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export function AppMenu() {
   const [theme, setTheme] = useState('light')
   const [aboutOpen, setAboutOpen] = useState(false)
 
+  useEffect(() => {
+    chrome?.storage?.local.get(['theme'], storage => {
+      const savedTheme = storage.theme || 'light'
+      setTheme(savedTheme)
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark')
+      }
+    })
+  }, [])
+
   function toggleTheme() {
     const newTheme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
     document.documentElement.classList.toggle('dark')
+
+    chrome?.storage?.local?.set({ theme: newTheme })
   }
 
   function handleCloseApp() {
