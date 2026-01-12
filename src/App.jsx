@@ -453,8 +453,8 @@ export function App() {
 
   return (
     <div className="bg-card text-card-foreground m-0 flex w-96 flex-col gap-4 p-4">
-      <div className="flex">
-        <img src="/favicon/logo.svg" alt="Font Swapper logo" className="mr-4 w-8" />
+      <div className="flex items-center">
+        <img src="/favicon/logo.svg" alt="FontBlitz logo" className="mr-4 size-7 min-h-7 min-w-7" />
 
         <InputGroup>
           <InputGroupInput
