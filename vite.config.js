@@ -4,23 +4,18 @@ import react from '@vitejs/plugin-react-swc'
 // import react from '@vitejs/plugin-react'
 import { resolve } from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
-import zip from 'vite-plugin-zip-pack'
 import chromeManifest from './manifest.chrome.json'
 import firefoxManifest from './manifest.firefox.json'
-import { name, version } from './package.json'
+import { version } from './package.json'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   const manifest = env.VITE_EXTENSION === 'FIREFOX' ? firefoxManifest : chromeManifest
   const outputDir = env.VITE_EXTENSION === 'FIREFOX' ? 'dist/firefox' : 'dist/chrome'
+  const browser = env.VITE_EXTENSION === 'FIREFOX' ? 'firefox' : 'chrome'
 
   return {
-    plugins: [
-      react(),
-      tailwindcss(),
-      crx({ manifest }),
-      zip({ outDir: 'release', outFileName: `${name}-${version}.zip` }),
-    ],
+    plugins: [react(), tailwindcss(), crx({ manifest, browser: browser })],
     resolve: {
       alias: {
         '@': `${resolve(__dirname, 'src')}`,
@@ -31,7 +26,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: outputDir,
-      sourcemap: true,
+      sourcemap: false,
       emptyOutDir: true,
       rollupOptions: {
         output: {
@@ -39,11 +34,6 @@ export default defineConfig(({ mode }) => {
             vendor: ['react', 'react-dom', 'react-dom/client'],
           },
         },
-      },
-    },
-    server: {
-      cors: {
-        origin: [/chrome-extension:\/\//],
       },
     },
   }
