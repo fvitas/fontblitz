@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge.jsx'
 import { Button } from '@/components/ui/button.jsx'
 import {
   DropdownMenu,
@@ -33,7 +34,7 @@ export function GoogleFontTypeFilterDropdown({ search, activeTab, onFontTypeChan
   }
 
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative flex items-center justify-center">
           <SlidersHorizontalIcon />
