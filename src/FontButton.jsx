@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button.jsx'
+import { FONT_TYPES } from '@/constants.js'
 import { useEffect } from 'react'
 import { twMerge } from 'tailwind-merge'
 
@@ -47,7 +48,7 @@ function loadGoogleFont(fontFamily) {
 
 export function FontButton({ font, isSelected, searchMatch, onPointerDown, onKeyDown }) {
   useEffect(() => {
-    if (font.fontType === 'google') {
+    if (font.fontType === FONT_TYPES.GOOGLE) {
       loadGoogleFont(font.family)
     }
   }, [])

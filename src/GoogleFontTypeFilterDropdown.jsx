@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.jsx'
+import { FONT_TYPES } from '@/constants.js'
 import { googleFontCategories } from '@/fonts.js'
 import { CheckIcon, SlidersHorizontalIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -27,7 +28,7 @@ export function GoogleFontTypeFilterDropdown({ search, activeTab, onFontTypeChan
     onFontTypeChange(new Set())
   }
 
-  if (search.length >= 2 || activeTab !== 'google') {
+  if (search.length >= 2 || activeTab !== FONT_TYPES.GOOGLE) {
     return null
   }
 

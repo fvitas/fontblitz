@@ -2,6 +2,7 @@ import { AppMenu } from '@/AppMenu.jsx'
 import { Card } from '@/components/ui/card.jsx'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group.jsx'
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/ui/motion-tabs.jsx'
+import { FONT_TYPES } from '@/constants.js'
 import { FontButton } from '@/FontButton.jsx'
 import { googleFonts, popularSystemFonts } from '@/fonts.js'
 import { FontSettingsDialog } from '@/FontSettingsDialog.jsx'
@@ -15,11 +16,6 @@ import { twMerge } from 'tailwind-merge'
 
 const systemFonts = await chrome?.fontSettings?.getFontList()
 
-const FONT_TYPES = {
-  SYSTEM: 'system',
-  GOOGLE: 'google',
-}
-
 const allSystemFonts = [
   ...popularSystemFonts,
   ...systemFonts
@@ -32,12 +28,12 @@ const allGoogleFonts = googleFonts.map(font => ({ ...font, fontType: FONT_TYPES.
 const tabs = [
   {
     name: 'System Fonts',
-    value: 'system',
+    value: FONT_TYPES.SYSTEM,
     fonts: allSystemFonts,
   },
   {
     name: 'Google Fonts',
-    value: 'google',
+    value: FONT_TYPES.GOOGLE,
     fonts: allGoogleFonts,
   },
   {
@@ -264,7 +260,7 @@ function VirtualizedFontButtonList({ fonts = [], selectedFont, onFontSelect }) {
 
 export function App() {
   const [search, setSearch] = useState('')
-  const [activeTab, setActiveTab] = useState('system')
+  const [activeTab, setActiveTab] = useState(FONT_TYPES.SYSTEM)
   const [selectedFont, setSelectedFont] = useState(null)
 
   const [filteredGoogleFonts, setFilteredGoogleFonts] = useState([])
@@ -287,7 +283,7 @@ export function App() {
       return
     }
 
-    if (font.fontType === 'system') {
+    if (font.fontType === FONT_TYPES.SYSTEM) {
       await chrome?.scripting?.executeScript({
         target: { tabId: tab.id },
         func: applyFont,
@@ -296,7 +292,7 @@ export function App() {
       return
     }
 
-    if (font.fontType === 'google') {
+    if (font.fontType === FONT_TYPES.GOOGLE) {
       const fontUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font.family)}&display=swap`
 
       try {
@@ -423,14 +419,14 @@ export function App() {
                 {tab.value === 'custom' && (
                   <CustomFontRenderer selectedFont={selectedFont} onFontSelect={() => handleSelectFont(null)} />
                 )}
-                {tab.value === 'system' && (
+                {tab.value === FONT_TYPES.SYSTEM && (
                   <VirtualizedFontButtonList
                     fonts={tab.fonts}
                     selectedFont={selectedFont}
                     onFontSelect={handleSelectFont}
                   />
                 )}
-                {tab.value === 'google' && (
+                {tab.value === FONT_TYPES.GOOGLE && (
                   <VirtualizedFontButtonList
                     fonts={!isEmpty(filteredGoogleFonts) ? filteredGoogleFonts : tab.fonts}
                     selectedFont={selectedFont}
