@@ -14,7 +14,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import { twMerge } from 'tailwind-merge'
 
-const systemFonts = await chrome?.fontSettings?.getFontList()
+const systemFonts = (await chrome?.fontSettings?.getFontList()) ?? []
 
 const allSystemFonts = [
   ...popularSystemFonts,
