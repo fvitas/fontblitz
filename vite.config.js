@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react-swc'
 import { codeInspectorPlugin } from 'code-inspector-plugin'
 import { resolve } from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
+import { ViteMinifyPlugin } from 'vite-plugin-minify'
 import chromeManifest from './manifest.chrome.json'
 import firefoxManifest from './manifest.firefox.json'
 import { version } from './package.json'
@@ -18,15 +19,13 @@ export default defineConfig(({ mode }) => {
   const extensionDir = env.VITE_EXTENSION === 'FIREFOX' ? 'dist/firefox' : 'dist/chrome'
   const outputDir = isWebsite ? 'dist/website' : extensionDir
 
-  console.log()
   return {
-    // root: isWebsite ? resolve(__dirname, 'website') : __dirname,
     root: isWebsite ? resolve(__dirname, 'website') : __dirname,
     plugins: [
       codeInspectorPlugin({ bundler: 'vite', editor: 'webstorm', hotKeys: ['altKey'] }),
       react(),
       tailwindcss(),
-      ...(!isWebsite ? [crx({ manifest, browser })] : []),
+      ...(isWebsite ? [ViteMinifyPlugin()] : [crx({ manifest, browser })]),
     ],
     resolve: {
       alias: {
